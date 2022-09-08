@@ -1,6 +1,17 @@
+import { useEffect } from 'react'
+import { Gallery } from './components/Gallery'
+import { Title } from './components/Title'
+
 function App() {
+  useEffect(() => {
+    const className = 'bg-primary';
+    document.body.setAttribute('class', className);
+  });
   return (
-    <button className="bg-slate-800 text-white px-4 py-2 m-4 rounded-md text-sm">Tombol Test</button>
+    <section
+    className='bg-gradient-to-tr from-primary to-[#CAD1E8] h-[100vh] w-[100vw] flex justify-center'>
+      <Title/>
+    </section>
   )
 }
 
