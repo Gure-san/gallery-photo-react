@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-primary
+  }
+  body::-webkit-scrollbar {
+    @apply w-2
+  }
+  body::-webkit-scrollbar-thumb {
+    @apply bg-extra rounded-sm
+  }
+  body::-webkit-scrollbar-track {
+    @apply bg-transparent
+  }
+}
