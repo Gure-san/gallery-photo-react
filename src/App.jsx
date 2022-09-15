@@ -17,7 +17,6 @@ const URL = {
   },
 };
 
-
 // Function and Component Area =====
 function sliceData(data, dispatch) {
   const obj = {
@@ -28,8 +27,6 @@ function sliceData(data, dispatch) {
 
   dispatch(obj);
 }
-
-
 
 function App() {
   const [data, setData] = useState('');
