@@ -6,8 +6,6 @@ import { Skeleton } from "../Skeleton/";
 import { GET_ACCESS, URL } from "../Provider";
 import { useReducer } from "react";
 
-
-
 // Function Area ======
 
 const keyIteration = (() => {
@@ -29,35 +27,49 @@ function generateUrl({ type, count = 1, customValue = false }) {
 }
 
 function getLastImg() {
-  const lastImgsContainer = Array.from(document.querySelectorAll('.colContainer'));
+  const lastImgsContainer = Array.from(
+    document.querySelectorAll(".colContainer")
+  );
   const rawParts = [...lastImgsContainer];
   const lastImgs = [];
-  rawParts.forEach(container => {
+  rawParts.forEach((container) => {
     const childrenContainer = Array.from(container.children);
-    lastImgs.push(childrenContainer.reverse()[0])
+    childrenContainer.length && lastImgs.push(childrenContainer.reverse()[0]);
   });
 
+  if(!lastImgs.length) return false;
   return lastImgs;
 }
 
-function removeClassLastImg() {
-  const lastImg = getLastImg();
-  console.log(lastImg);
+async function processData(incomingData, dispatch) {
+  const data = await incomingData;
+  dispatch(data);
 }
 
-function lastImgObserver(dispatch) {
+function checkData(incomingData, dispatch) {
+  function acceptData(arrData) {
+    const prevData = arrData;
+    prevData.forEach(col => col.push(incomingData));
+    return prevData;
+  } 
+
+  dispatch(prevData => {
+    const {col_one, col_two, col_three} = prevData;
+    const [newData_one, newData_two, newData_three] = acceptData([col_one, col_two, col_three]);
+    return { col_one : newData_one, col_two : newData_two, col_three: newData_three };
+  })
+}
+
+function lastImgObserver(dispatch, prevData) {
   const lastImgs = getLastImg();
   const lastImgObserver = new IntersectionObserver(
     (entries, observer) => {
       entries.forEach((img) => {
         if (img.isIntersecting) {
           if (img.target.classList.contains("lastImg")) {
-            fetch("src/dataDummy.json")
-            .then((src) => src.json())
-            .then((src) => {
-              const { Url } = src;
-              return dispatch(Url);
-            });
+            fetch('src/dataDummy.json').
+            then(src => src.json()).
+            then(src => checkData(src, dispatch));
             observer.unobserve(img.target);
           }
         }
@@ -65,18 +77,19 @@ function lastImgObserver(dispatch) {
     },
     { rootMargin: "200px 0px" }
   );
-  
+
   lastImgs.forEach((img) => lastImgObserver.observe(img));
 }
+
 // Component Area ======
 
-function GenerateImgElement({ url, lastElement = null, newImg = false }) {
+function GenerateImgElement({ url, lastElement = null}) {
   return (
     <a
       href={url}
       download
       className={`flex relative before:absolute before:w-full before:h-full before:bg-slate-500 before:opacity-0 hover:before:opacity-30 before:duration-300 ${
-        url == lastElement || newImg ? "lastImg" : ""
+        url == lastElement ? "lastImg" : ""
       }`}
     >
       <img src={url} alt="" className="object-cover rounded-md" />
@@ -84,67 +97,57 @@ function GenerateImgElement({ url, lastElement = null, newImg = false }) {
   );
 }
 
-function ImageElements({ dataUrl, newImg = false }) {
-  const lastElement = !newImg ? [...dataUrl].reverse()[0]["Url"] : null;
+function ImageElements({ dataUrl }) {
+  if(!Array.isArray(dataUrl)) return null;
+  const lastElement = [...dataUrl].reverse()[0]["Url"];
   return (
     <React.Fragment>
-      {!newImg &&
-        dataUrl.map(({ Url }) => (
-          <GenerateImgElement
-            url={Url}
-            lastElement={lastElement}
-            key={keyIteration()}
-          />
-        ))}
-
-      {newImg && <GenerateImgElement url={newImg} newImg={true} />}
+      {dataUrl.map(({ Url }) => (
+        <GenerateImgElement
+          url={Url}
+          lastElement={lastElement}
+          key={keyIteration()}
+        />
+      ))}
     </React.Fragment>
   );
 }
 
 export function Gallery({ data }) {
-  const [newImg, setNewImg] = useState("");
-
+  const [dataImgs, setDataImgs] = useState('');
+  const currentDataImgs = useRef();
+  !dataImgs && processData(data, setDataImgs);
+  
   useEffect(() => {
-    // const checkIndicator = newImgIndicator.length;
-    // if( checkIndicator ) {
-    //   lastImgObserver()
-    // }
-    lastImgObserver(setNewImg);
-    console.log(newImg)
+    currentDataImgs.current =  dataImgs;
+    console.log(currentDataImgs.current);
 
-    let timer = null;
-    if(!newImg) {
-      timer = setTimeout(() => {
-        lastImgObserver(setNewImg);
-      }, 1000);
-    }
+    const timer = setTimeout(() => {
+      lastImgObserver(setDataImgs);
+    }, 1000);
 
     return () => {
-      if(!newImg) clearTimeout(timer);
-    }
-  }, [newImg]);
+      clearTimeout(timer);
+    };
+  }, [dataImgs]);
 
   return (
     <React.Fragment>
-      {data ? (
+      { dataImgs ? (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] xl:max-w-[1024px] lg:max-w-[768px] max-w-[425px] gap-4 mx-auto mb-8">
           {/* Col 1 */}
           <div className="flex flex-wrap gap-4 w-full colContainer">
-            <ImageElements dataUrl={data.col_one} />
-            {newImg && <ImageElements newImg={newImg} />}
+            { dataImgs && <ImageElements dataUrl={dataImgs.col_one} /> }
           </div>
 
           {/* Col 2 */}
           <div className="flex flex-wrap gap-4 w-full colContainer">
-            <ImageElements dataUrl={data.col_two} />
-            {newImg && <ImageElements newImg={newImg} />}
+            { dataImgs && <ImageElements dataUrl={dataImgs.col_two} /> }
           </div>
 
           {/* Col 3 */}
           <div className="xl:flex lg:hidden flex flex-wrap gap-4 w-full colContainer">
-            <ImageElements dataUrl={data.col_three} />
-            {newImg && <ImageElements newImg={newImg} />}
+            { dataImgs && <ImageElements dataUrl={dataImgs.col_three} /> }
           </div>
         </div>
       ) : (
