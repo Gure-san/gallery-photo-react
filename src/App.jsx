@@ -2,20 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Title } from "./components/Title";
 import { Search } from "./components/Search";
 import { Gallery } from "./components/Gallery";
-import { Skeleton } from "./components/Skeleton";
+import { GET_ACCESS, URL } from "./components/Provider";
 
 const initImages = 12;
-const GET_ACCESS = (variable) => import.meta.env[variable];
-const URL = {
-  INITIAL: "https://api.unsplash.com",
-  RANDOM: "/photos/random",
-  SEARCH: "/search/photos",
-  CLIENT_ID: "client_id=",
-  PARAMS: {
-    PER_PAGE: "per_page=",
-    COUNT: "count=",
-  },
-};
 
 // Function and Component Area =====
 function sliceData(data, dispatch) {
@@ -29,22 +18,24 @@ function sliceData(data, dispatch) {
 }
 
 function App() {
-  const [data, setData] = useState('');
+  const [data, setData] = useState('');c
+  const [querySearch, setQuerySearch] = useState(false);
+
   useEffect(() => {
-    // Get Random Photo
+    const url = !querySearch ? 'src/dataTest.json' : querySearch;
     // fetch(`${URL.INITIAL}${URL.RANDOM}?${URL.PARAMS.COUNT}${initCountRandom}&${URL.CLIENT_ID}${GET_ACCESS('VITE_UNSPLASH_API_KEY')}`).
     // then(data => data.json()).
     // then(data => setData(data))
-    fetch('src/dataTest.json').
+    fetch(url).
     then(src => src.json()).
     then(src => sliceData(src, setData)); 
-  }, []);
+  }, [querySearch]);
 
   return (
     <React.Fragment>
       <Title />
-      <Search />
-      <Gallery data={data} />
+      <Search querySearch={setQuerySearch} dispatchPrevData={setData}/>
+      <Gallery data={data} search={querySearch} />
     </React.Fragment>
   );
 }

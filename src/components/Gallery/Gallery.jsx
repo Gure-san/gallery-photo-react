@@ -1,12 +1,11 @@
 import React from "react";
-import { useRef } from "react";
-import { createContext } from "react";
 import { useState, useEffect } from "react";
 import { Skeleton } from "../Skeleton/";
 import { GET_ACCESS, URL } from "../Provider";
-import { useReducer } from "react";
 
 // Function Area ======
+const SMALL_DESKTOP = 1024;
+const NORMAL_DEKSTOP = 1280;
 
 const keyIteration = (() => {
   let numb = 0;
@@ -36,14 +35,17 @@ function getLastImg() {
     const childrenContainer = Array.from(container.children);
     childrenContainer.length && lastImgs.push(childrenContainer.reverse()[0]);
   });
-
   if(!lastImgs.length) return false;
+
+  lastImgs.forEach(img => img.classList.add('lastImg'));
   return lastImgs;
 }
 
 async function processData(incomingData, dispatch) {
   const data = await incomingData;
-  dispatch(data);
+  dispatch(prev => {
+    return prev = data;
+  });
 }
 
 function checkData(incomingData, dispatch) {
@@ -60,7 +62,7 @@ function checkData(incomingData, dispatch) {
   })
 }
 
-function lastImgObserver(dispatch, prevData) {
+function lastImgObserver(dispatch, search ) {
   const lastImgs = getLastImg();
   const lastImgObserver = new IntersectionObserver(
     (entries, observer) => {
@@ -75,22 +77,34 @@ function lastImgObserver(dispatch, prevData) {
         }
       });
     },
-    { rootMargin: "200px 0px" }
+    { rootMargin: "400px 0px" }
   );
 
   lastImgs.forEach((img) => lastImgObserver.observe(img));
 }
 
+function windowSizeObserver(element, dispatch) {
+  const observer = new ResizeObserver(entries => {
+    entries.forEach(screen => {
+      if(screen.contentRect.width >= NORMAL_DEKSTOP) dispatch(screen.contentRect.width);
+      
+      if(screen.contentRect.width < NORMAL_DEKSTOP && screen.contentRect.width >= SMALL_DESKTOP ) dispatch(screen.contentRect.width);
+      
+      if(screen.contentRect.width < SMALL_DESKTOP) dispatch(screen.contentRect.width);
+    })
+  });
+
+  observer.observe(element);
+}
+
 // Component Area ======
 
-function GenerateImgElement({ url, lastElement = null}) {
+function GenerateImgElement({ url, lastElement = false}) {
   return (
     <a
       href={url}
       download
-      className={`flex relative before:absolute before:w-full before:h-full before:bg-slate-500 before:opacity-0 hover:before:opacity-30 before:duration-300 ${
-        url == lastElement ? "lastImg" : ""
-      }`}
+      className={`flex relative before:absolute before:w-full before:h-full before:bg-slate-500 before:opacity-0 hover:before:opacity-30 before:duration-300`}
     >
       <img src={url} alt="" className="object-cover rounded-md" />
     </a>
@@ -99,13 +113,11 @@ function GenerateImgElement({ url, lastElement = null}) {
 
 function ImageElements({ dataUrl }) {
   if(!Array.isArray(dataUrl)) return null;
-  const lastElement = [...dataUrl].reverse()[0]["Url"];
   return (
     <React.Fragment>
       {dataUrl.map(({ Url }) => (
         <GenerateImgElement
           url={Url}
-          lastElement={lastElement}
           key={keyIteration()}
         />
       ))}
@@ -113,23 +125,21 @@ function ImageElements({ dataUrl }) {
   );
 }
 
-export function Gallery({ data }) {
+export function Gallery({ data, search }) {
   const [dataImgs, setDataImgs] = useState('');
-  const currentDataImgs = useRef();
-  !dataImgs && processData(data, setDataImgs);
+  const [sizeDevice, setSizeDevice] = useState(0);
+  (!dataImgs || search) && processData(data, setDataImgs);
   
   useEffect(() => {
-    currentDataImgs.current =  dataImgs;
-    console.log(currentDataImgs.current);
-
     const timer = setTimeout(() => {
-      lastImgObserver(setDataImgs);
+      lastImgObserver(setDataImgs, search);
+      windowSizeObserver(window.document.body, setSizeDevice)
     }, 1000);
 
     return () => {
       clearTimeout(timer);
     };
-  }, [dataImgs]);
+  }, [dataImgs, sizeDevice]);
 
   return (
     <React.Fragment>
@@ -142,12 +152,12 @@ export function Gallery({ data }) {
 
           {/* Col 2 */}
           <div className="flex flex-wrap gap-4 w-full colContainer">
-            { dataImgs && <ImageElements dataUrl={dataImgs.col_two} /> }
+            { (dataImgs && sizeDevice > SMALL_DESKTOP) && <ImageElements dataUrl={dataImgs.col_two} /> }
           </div>
 
           {/* Col 3 */}
           <div className="xl:flex lg:hidden flex flex-wrap gap-4 w-full colContainer">
-            { dataImgs && <ImageElements dataUrl={dataImgs.col_three} /> }
+            { (dataImgs && (sizeDevice > NORMAL_DEKSTOP)) && <ImageElements dataUrl={dataImgs.col_three} /> }
           </div>
         </div>
       ) : (
