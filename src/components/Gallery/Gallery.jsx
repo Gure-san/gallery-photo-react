@@ -42,21 +42,14 @@ function checkData(incomingData, dispatch) {
   })
 }
 
-function lastImgObserver({dispatch = null, state}) {
+function lastImgObserver({dispatch = null}) {
   const lastImgs = getLastImg();
-  const stateRendering = state();
-
-  const getRootMargin = (currentState) => {
-
-  }
-
-  console.log('state : ' + stateRendering)
   const observer = new IntersectionObserver(
     (entries, observer) => {
       entries.forEach((img) => {
         if (img.isIntersecting) {
           if (img.target.classList.contains("lastImg")) {
-            console.log(img.target)
+            console.log(img.isIntersecting)
             fetch('src/dataDummy.json').
             then(src => src.json()).
             then(src => checkData(src, dispatch));
@@ -65,7 +58,7 @@ function lastImgObserver({dispatch = null, state}) {
         }
       });
     },
-    { rootMargin: "0px 0px" }
+    { rootMargin: "100px 0px" }
   );
 
   if(!lastImgs) return false;
@@ -123,18 +116,9 @@ export function Gallery({ data, state }) {
     console.log(dataImgs)
     if(!dataImgs) setDataImgs(data);
 
-    const getState = () => {
-      let currentState = state;
-      let timer = setTimeout(() => {
-        return currentState = 'initial';
-      }, 2000);
-
-      clearTimeout(timer);
-      return currentState;
-    };
     const timer = setTimeout(() => {
       console.log('timer on...');
-      lastImgObserver({dispatch : setDataImgs, state : getState });
+      lastImgObserver({dispatch : setDataImgs });
       windowSizeObserver({element : window.document.body, dispatch : setSizeDevice})
     }, 1000);
 
