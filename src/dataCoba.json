@@ -1,13 +1,8 @@
 [
-  { "Url" : "src/asset/img1.jpg" },
-  { "Url" : "src/asset/img2.jpg" },
-  { "Url" : "src/asset/img3.jpg" },
-  { "Url" : "src/asset/img4.jpg" },
   { "Url" : "src/asset/img5.jpg" },
   { "Url" : "src/asset/img6.jpg" },
   { "Url" : "src/asset/img7.jpg" },
   { "Url" : "src/asset/img8.jpg" },
   { "Url" : "src/asset/img12.jpg" },
-  { "Url" : "src/asset/img11.jpg" },
-  { "Url" : "src/asset/img10.jpg" }
+  { "Url" : "src/asset/img11.jpg" }
 ]

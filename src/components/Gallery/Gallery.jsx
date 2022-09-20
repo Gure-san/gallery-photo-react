@@ -1,29 +1,16 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useState, useEffect } from "react";
 import { Skeleton } from "../Skeleton/";
-import { GET_ACCESS, URL } from "../Provider";
+import { generateUrl, GET_ACCESS, URL, SMALL_DESKTOP, NORMAL_DEKSTOP } from "../Provider";
+
+const initImages = 12;
 
 // Function Area ======
-const SMALL_DESKTOP = 1024;
-const NORMAL_DEKSTOP = 1280;
 
 const keyIteration = (() => {
   let numb = 0;
   return () => (numb += 1);
 })();
-
-function generateUrl({ type, count = 1, customValue = false }) {
-  switch (type) {
-    case "RANDOM":
-      const url = `${URL.INITIAL}${URL.RANDOM}?${URL.PARAMS.COUNT}${count}&${
-        URL.CLIENT_ID
-      }${GET_ACCESS("VITE_UNSPLASH_API_KEY")}`;
-      return url;
-
-    default:
-      break;
-  }
-}
 
 function getLastImg() {
   const lastImgsContainer = Array.from(
@@ -41,13 +28,6 @@ function getLastImg() {
   return lastImgs;
 }
 
-async function processData(incomingData, dispatch) {
-  const data = await incomingData;
-  dispatch(prev => {
-    return prev = data;
-  });
-}
-
 function checkData(incomingData, dispatch) {
   function acceptData(arrData) {
     const prevData = arrData;
@@ -62,13 +42,21 @@ function checkData(incomingData, dispatch) {
   })
 }
 
-function lastImgObserver(dispatch, search ) {
+function lastImgObserver({dispatch = null, state}) {
   const lastImgs = getLastImg();
-  const lastImgObserver = new IntersectionObserver(
+  const stateRendering = state();
+
+  const getRootMargin = (currentState) => {
+
+  }
+
+  console.log('state : ' + stateRendering)
+  const observer = new IntersectionObserver(
     (entries, observer) => {
       entries.forEach((img) => {
         if (img.isIntersecting) {
           if (img.target.classList.contains("lastImg")) {
+            console.log(img.target)
             fetch('src/dataDummy.json').
             then(src => src.json()).
             then(src => checkData(src, dispatch));
@@ -77,13 +65,14 @@ function lastImgObserver(dispatch, search ) {
         }
       });
     },
-    { rootMargin: "400px 0px" }
+    { rootMargin: "0px 0px" }
   );
 
-  lastImgs.forEach((img) => lastImgObserver.observe(img));
+  if(!lastImgs) return false;
+  lastImgs.forEach((img) => observer.observe(img))
 }
 
-function windowSizeObserver(element, dispatch) {
+function windowSizeObserver({element = null, dispatch = null, state}) {
   const observer = new ResizeObserver(entries => {
     entries.forEach(screen => {
       if(screen.contentRect.width >= NORMAL_DEKSTOP) dispatch(screen.contentRect.width);
@@ -93,13 +82,14 @@ function windowSizeObserver(element, dispatch) {
       if(screen.contentRect.width < SMALL_DESKTOP) dispatch(screen.contentRect.width);
     })
   });
-
+  
   observer.observe(element);
 }
 
+
 // Component Area ======
 
-function GenerateImgElement({ url, lastElement = false}) {
+function GenerateImgElement({ url }) {
   return (
     <a
       href={url}
@@ -125,15 +115,27 @@ function ImageElements({ dataUrl }) {
   );
 }
 
-export function Gallery({ data, search }) {
+export function Gallery({ data, state }) {
   const [dataImgs, setDataImgs] = useState('');
   const [sizeDevice, setSizeDevice] = useState(0);
-  (!dataImgs || search) && processData(data, setDataImgs);
-  
+
   useEffect(() => {
+    console.log(dataImgs)
+    if(!dataImgs) setDataImgs(data);
+
+    const getState = () => {
+      let currentState = state;
+      let timer = setTimeout(() => {
+        return currentState = 'initial';
+      }, 2000);
+
+      clearTimeout(timer);
+      return currentState;
+    };
     const timer = setTimeout(() => {
-      lastImgObserver(setDataImgs, search);
-      windowSizeObserver(window.document.body, setSizeDevice)
+      console.log('timer on...');
+      lastImgObserver({dispatch : setDataImgs, state : getState });
+      windowSizeObserver({element : window.document.body, dispatch : setSizeDevice})
     }, 1000);
 
     return () => {
@@ -147,17 +149,17 @@ export function Gallery({ data, search }) {
         <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] xl:max-w-[1024px] lg:max-w-[768px] max-w-[425px] gap-4 mx-auto mb-8">
           {/* Col 1 */}
           <div className="flex flex-wrap gap-4 w-full colContainer">
-            { dataImgs && <ImageElements dataUrl={dataImgs.col_one} /> }
+            <ImageElements dataUrl={dataImgs.col_one} />
           </div>
 
           {/* Col 2 */}
           <div className="flex flex-wrap gap-4 w-full colContainer">
-            { (dataImgs && sizeDevice > SMALL_DESKTOP) && <ImageElements dataUrl={dataImgs.col_two} /> }
+            { (sizeDevice > SMALL_DESKTOP) && <ImageElements dataUrl={dataImgs.col_two} /> }
           </div>
 
           {/* Col 3 */}
           <div className="xl:flex lg:hidden flex flex-wrap gap-4 w-full colContainer">
-            { (dataImgs && (sizeDevice > NORMAL_DEKSTOP)) && <ImageElements dataUrl={dataImgs.col_three} /> }
+            { (sizeDevice > NORMAL_DEKSTOP) && <ImageElements dataUrl={dataImgs.col_three} /> }
           </div>
         </div>
       ) : (

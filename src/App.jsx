@@ -2,11 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Title } from "./components/Title";
 import { Search } from "./components/Search";
 import { Gallery } from "./components/Gallery";
-import { GET_ACCESS, URL } from "./components/Provider";
+import { Skeleton } from "./components/Skeleton";
+import { GET_ACCESS, URL, generateUrl } from "./components/Provider";
 
-const initImages = 12;
-
-// Function and Component Area =====
 function sliceData(data, dispatch) {
   const obj = {
     col_one: data.slice(0, 4),
@@ -18,24 +16,23 @@ function sliceData(data, dispatch) {
 }
 
 function App() {
-  const [data, setData] = useState('');c
-  const [querySearch, setQuerySearch] = useState(false);
+  const [data, setData] = useState(false);
+  const [stateRendering, setStateRendering] = useState({ state : 'initial', querySearch : false }) 
 
   useEffect(() => {
-    const url = !querySearch ? 'src/dataTest.json' : querySearch;
-    // fetch(`${URL.INITIAL}${URL.RANDOM}?${URL.PARAMS.COUNT}${initCountRandom}&${URL.CLIENT_ID}${GET_ACCESS('VITE_UNSPLASH_API_KEY')}`).
-    // then(data => data.json()).
-    // then(data => setData(data))
-    fetch(url).
-    then(src => src.json()).
-    then(src => sliceData(src, setData)); 
-  }, [querySearch]);
+    if(stateRendering.state == 'search') setData(false);
+
+    const url = !stateRendering.querySearch ? 'src/dataTest.json' : stateRendering.querySearch; 
+    fetch(url)
+    .then(data => data.json())
+    .then(src => sliceData(src, setData));
+  }, [stateRendering]);
 
   return (
     <React.Fragment>
       <Title />
-      <Search querySearch={setQuerySearch} dispatchPrevData={setData}/>
-      <Gallery data={data} search={querySearch} />
+      <Search stateRendering={setStateRendering} />
+      {!data ? <Skeleton/> : <Gallery data={data} state={stateRendering.state} />}
     </React.Fragment>
   );
 }
