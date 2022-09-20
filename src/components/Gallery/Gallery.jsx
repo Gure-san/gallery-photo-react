@@ -3,8 +3,6 @@ import { useState, useEffect } from "react";
 import { Skeleton } from "../Skeleton/";
 import { generateUrl, GET_ACCESS, URL, SMALL_DESKTOP, NORMAL_DEKSTOP } from "../Provider";
 
-const initImages = 12;
-
 // Function Area ======
 
 const keyIteration = (() => {
@@ -82,7 +80,7 @@ function windowSizeObserver({element = null, dispatch = null, state}) {
 
 // Component Area ======
 
-function GenerateImgElement({ url }) {
+function GenerateImgElement({ url, width, height, alt }) {
   return (
     <a
       href={url}
@@ -98,9 +96,9 @@ function ImageElements({ dataUrl }) {
   if(!Array.isArray(dataUrl)) return null;
   return (
     <React.Fragment>
-      {dataUrl.map(({ Url }) => (
+      {dataUrl.map((obj) => (
         <GenerateImgElement
-          url={Url}
+          url={obj.url}
           key={keyIteration()}
         />
       ))}
@@ -113,11 +111,9 @@ export function Gallery({ data, state }) {
   const [sizeDevice, setSizeDevice] = useState(0);
 
   useEffect(() => {
-    console.log(dataImgs)
-    if(!dataImgs) setDataImgs(data);
+    // if(!dataImgs) setDataImgs(data);
 
     const timer = setTimeout(() => {
-      console.log('timer on...');
       lastImgObserver({dispatch : setDataImgs });
       windowSizeObserver({element : window.document.body, dispatch : setSizeDevice})
     }, 1000);

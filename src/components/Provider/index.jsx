@@ -22,7 +22,7 @@ function generateUrl({ type, count = 1, customValue = false }) {
   let url;
   switch (type) {
     case "EDITORIAL" :
-      url = `${BASE_HEAD}${URL.PHOTOS}?${URL.PARAMS.COUNT}${count}&${BASE_FOOT}`;
+      url = `${BASE_HEAD}${URL.PHOTOS}?${URL.PARAMS.PER_PAGE}${count}&${BASE_FOOT}`;
       return url;
 
     case "RANDOM" :
