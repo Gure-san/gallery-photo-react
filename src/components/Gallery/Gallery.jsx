@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { useState, useEffect } from "react";
 import { Skeleton } from "../Skeleton/";
-import { generateUrl, GET_ACCESS, URL, SMALL_DESKTOP, NORMAL_DEKSTOP } from "../Provider";
+import { generateUrl, GET_ACCESS, URL, SMALL_DESKTOP, NORMAL_DEKSTOP, selectionProperties } from "../Provider";
 
 // Function Area ======
 
@@ -28,8 +28,9 @@ function getLastImg() {
 
 function checkData(incomingData, dispatch) {
   function acceptData(arrData) {
+    const data = selectionProperties(incomingData);
     const prevData = arrData;
-    prevData.forEach(col => col.push(incomingData));
+    prevData.forEach(col => col.push(data));
     return prevData;
   } 
 
@@ -40,15 +41,18 @@ function checkData(incomingData, dispatch) {
   })
 }
 
-function lastImgObserver({dispatch = null}) {
+function lastImgObserver({dispatch = null, state}) {
+  const { stateRendering, querySearch } = state;
   const lastImgs = getLastImg();
+  const url = (stateRendering == 'search') ? generateUrl({type : 'RANDOM_SEARCH', customValue : querySearch}) : generateUrl({type : 'RANDOM'}); 
+  console.log(url);
   const observer = new IntersectionObserver(
     (entries, observer) => {
       entries.forEach((img) => {
         if (img.isIntersecting) {
           if (img.target.classList.contains("lastImg")) {
             console.log(img.isIntersecting)
-            fetch('src/dataDummy.json').
+            fetch(url).
             then(src => src.json()).
             then(src => checkData(src, dispatch));
             observer.unobserve(img.target);
@@ -87,7 +91,7 @@ function GenerateImgElement({ url, width, height, alt }) {
       download
       className={`flex relative before:absolute before:w-full before:h-full before:bg-slate-500 before:opacity-0 hover:before:opacity-30 before:duration-300`}
     >
-      <img src={url} alt="" className="object-cover rounded-md" />
+      <img src={url} width={width} height={height} alt={alt} className="object-cover rounded-md" />
     </a>
   );
 }
@@ -99,6 +103,9 @@ function ImageElements({ dataUrl }) {
       {dataUrl.map((obj) => (
         <GenerateImgElement
           url={obj.url}
+          width={obj.width}
+          height={obj.height}
+          alt={obj.alt}
           key={keyIteration()}
         />
       ))}
@@ -111,10 +118,10 @@ export function Gallery({ data, state }) {
   const [sizeDevice, setSizeDevice] = useState(0);
 
   useEffect(() => {
-    // if(!dataImgs) setDataImgs(data);
+    if(!dataImgs) setDataImgs(data);
 
     const timer = setTimeout(() => {
-      lastImgObserver({dispatch : setDataImgs });
+      lastImgObserver({dispatch : setDataImgs, state : state });
       windowSizeObserver({element : window.document.body, dispatch : setSizeDevice})
     }, 1000);
 

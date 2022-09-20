@@ -3,32 +3,10 @@ import { Title } from "./components/Title";
 import { Search } from "./components/Search";
 import { Gallery } from "./components/Gallery";
 import { Skeleton } from "./components/Skeleton";
-import { GET_ACCESS, URL, generateUrl } from "./components/Provider";
+import { GET_ACCESS, URL, generateUrl, selectionProperties } from "./components/Provider";
 
 const initImages = 12;
-function nameConnector(firstName, lastName) {
-  const first_name = (firstName != null) ? firstName : '';
-  const last_name = (lastName != null) ? lastName : "";
-  return `${first_name} ${last_name}`;
-}
-
-function selectionProperties(arrData) {
-  const tempData = [];
-  arrData.forEach(obj => {
-    console.log(obj)
-    tempData.push({
-      width: obj.width,
-      height: obj.height,
-      url: obj.urls.regular,
-      photographer: {
-        name: nameConnector(obj.user.first_name, obj.user.last_name),
-        profil: obj.user.links.html
-      },
-      download: obj.links.download_location
-    });
-  })
-  return tempData;
-}
+console.log(GET_ACCESS('VITE_UNSPLASH_API_KEY'))
 
 function sliceData(data, dispatch) {
   const obj = {
@@ -60,7 +38,7 @@ function App() {
     <React.Fragment>
       <Title />
       <Search stateRendering={setStateRendering} />
-      {!data ? <Skeleton/> : <Gallery data={data} state={stateRendering.state} />}
+      {!data ? <Skeleton/> : <Gallery data={data} state={stateRendering} />}
     </React.Fragment>
   );
 }
