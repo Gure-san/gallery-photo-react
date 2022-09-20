@@ -88,6 +88,7 @@ function GenerateImgElement({ url, width, height, alt }) {
   return (
     <a
       href={url}
+      target={"_blank"}
       download
       className={`flex relative before:absolute before:w-full before:h-full before:bg-slate-500 before:opacity-0 hover:before:opacity-30 before:duration-300`}
     >

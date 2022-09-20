@@ -6,7 +6,6 @@ import { Skeleton } from "./components/Skeleton";
 import { GET_ACCESS, URL, generateUrl, selectionProperties } from "./components/Provider";
 
 const initImages = 12;
-console.log(GET_ACCESS('VITE_UNSPLASH_API_KEY'))
 
 function sliceData(data, dispatch) {
   const obj = {
@@ -15,7 +14,6 @@ function sliceData(data, dispatch) {
     col_three: selectionProperties(data.slice(8, 12)),
   };
 
-  console.log(obj)
   dispatch(obj);
 }
 
