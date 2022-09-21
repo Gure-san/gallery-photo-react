@@ -1,6 +1,5 @@
 import React from "react";
 import { useState } from "react";
-import { GET_ACCESS, URL, generateUrl } from "../Provider";
 
 function Search({stateRendering}) {
   const [search, setSearch] = useState('');
@@ -8,10 +7,9 @@ function Search({stateRendering}) {
   const handleChange = (event) => setSearch(event.target.value);
   const postSearchData = (event) => {
     event.preventDefault();
-    const queryUrl = generateUrl({type : 'SEARCH', customValue : search});
     const state = {
       state : 'search',
-      querySearch : 'src/dataCoba.json' 
+      querySearch : search
     }
 
     return stateRendering(state);
@@ -27,6 +25,7 @@ function Search({stateRendering}) {
           value={search}
           onChange={handleChange}
           role={"search"}
+          autoComplete="off"
         />
         <button
         type={"submit"} 

@@ -31,14 +31,12 @@ function generateUrl({ type, count = 1, customValue = false }) {
       return url;
 
     case "RANDOM_SEARCH" :
-      url = `${BASE_HEAD}${URL.RANDOM}?${URL.PARAMS.COUNT}${count}&${URL.PARAMS.QUERY}&${customValue}&${BASE_FOOT}`;
+      url = `${BASE_HEAD}${URL.RANDOM}?${URL.PARAMS.COUNT}${count}&${URL.PARAMS.QUERY}${customValue}&${BASE_FOOT}`;
       return url;
 
     case "SEARCH" :
       url = `${BASE_HEAD}${URL.SEARCH}?${URL.PARAMS.QUERY}${customValue}&${BASE_FOOT}`;
       return url;
-
-    
   }
 }
 
@@ -48,23 +46,7 @@ function nameConnector(firstName, lastName) {
   return `${first_name} ${last_name}`;
 }
 
-function selectProps(obj, debug = false) {
-  // if(debug) {
-  //   const data = {
-  //     alt: obj.alt,
-  //     width: obj.width,
-  //     height: obj.height,
-  //     url: obj.url,
-  //     photographer: {
-  //       name: obj.photographer.name,
-  //       profil: obj.photographer.profil,
-  //     },
-  //     download: obj.download,
-  //   };
-    
-  //   return data;
-  // }
-
+function selectProps(obj) {
   const data = {
     alt: obj.alt_description == null ? "" : obj.alt_description,
     width: obj.width,
@@ -80,7 +62,7 @@ function selectProps(obj, debug = false) {
   return data;
 }
 
-function selectionProperties(data, debug = false) {
+function selectionProperties(data) {
   if(Array.isArray(data)) {
     const tempData = [];
     data.forEach((obj) => {
@@ -92,7 +74,7 @@ function selectionProperties(data, debug = false) {
   return selectProps(data)
 }
 
-function getDummyUrl() {
+function generateDummyUrl() {
   const numb = RANDOM_NUMB_DEBUG();
   const urlHead = 'src/test/';
   let url = null;
@@ -126,7 +108,19 @@ function getDummyUrl() {
   return url;
 }
 
+function getDummyUrl({storePrevUrl, reload = false}) {
+  let currentDummyUrl = generateDummyUrl();
+  if(!storePrevUrl) {
+    storePrevUrl = currentDummyUrl;
+    return currentDummyUrl;
+  }
 
+  if(storePrevUrl.url == currentDummyUrl) {
+    getDummyUrl({reload : true});
+  }
+
+  return currentDummyUrl;
+}
 
 export { 
   GET_ACCESS,
@@ -136,5 +130,6 @@ export {
   generateUrl,
   nameConnector,
   selectionProperties,
+  generateDummyUrl,
   getDummyUrl
 }
