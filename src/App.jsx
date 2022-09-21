@@ -3,26 +3,18 @@ import { Title } from "./components/Title";
 import { Search } from "./components/Search";
 import { Gallery } from "./components/Gallery";
 import { Skeleton } from "./components/Skeleton";
-import { GET_ACCESS, URL, generateUrl, selectionProperties, getDummyUrl } from "./components/Provider";
+import { GET_ACCESS, URL, generateUrl, selectionProperties, getDummyUrl} from "./components/Provider";
 
-// const temp = generateUrl({ type: "EDITORIAL", count: initImages });
+
+// const temp = ;
 const tempUrl = 'src/test/dataTest.json';
 const initImages = 12;
 
 function sliceData(data, dispatch) {
   const obj = {
-    col_one: {
-      data : selectionProperties(data.slice(0, 4), true),
-      skip : false
-    },
-    col_two: {
-      data : selectionProperties(data.slice(4, 8), true),
-      skip : true
-    },
-    col_three: {
-      data : selectionProperties(data.slice(8, 12), true),
-      skip : true
-    },
+    col_one: selectionProperties(data.slice(0, 4)),
+    col_two: selectionProperties(data.slice(4, 8)),
+    col_three: selectionProperties(data.slice(8, 12)),
   };
 
   dispatch(obj);
@@ -36,7 +28,7 @@ function App() {
     if(stateRendering.state == 'search') setData(false);
 
     const url = !stateRendering.querySearch
-      ? tempUrl
+      ? generateUrl({ type: "EDITORIAL", count: initImages })
       : stateRendering.querySearch; 
     fetch(url)
     .then(data => data.json())

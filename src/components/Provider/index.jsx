@@ -49,21 +49,21 @@ function nameConnector(firstName, lastName) {
 }
 
 function selectProps(obj, debug = false) {
-  if(debug) {
-    const data = {
-      alt: obj.alt,
-      width: obj.width,
-      height: obj.height,
-      url: obj.url,
-      photographer: {
-        name: obj.photographer.name,
-        profil: obj.photographer.profil,
-      },
-      download: obj.download,
-    };
+  // if(debug) {
+  //   const data = {
+  //     alt: obj.alt,
+  //     width: obj.width,
+  //     height: obj.height,
+  //     url: obj.url,
+  //     photographer: {
+  //       name: obj.photographer.name,
+  //       profil: obj.photographer.profil,
+  //     },
+  //     download: obj.download,
+  //   };
     
-    return data;
-  }
+  //   return data;
+  // }
 
   const data = {
     alt: obj.alt_description == null ? "" : obj.alt_description,
@@ -81,16 +81,15 @@ function selectProps(obj, debug = false) {
 }
 
 function selectionProperties(data, debug = false) {
-  console.log(data)
   if(Array.isArray(data)) {
     const tempData = [];
     data.forEach((obj) => {
-      tempData.push(selectProps(obj, debug));
+      tempData.push(selectProps(obj));
     });
     return tempData;
   }
 
-  return selectProps(data, debug)
+  return selectProps(data)
 }
 
 function getDummyUrl() {
@@ -126,6 +125,7 @@ function getDummyUrl() {
 
   return url;
 }
+
 
 
 export { 
