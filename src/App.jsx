@@ -3,7 +3,7 @@ import { Title } from "./components/Title";
 import { Search } from "./components/Search";
 import { Gallery } from "./components/Gallery";
 import { Skeleton } from "./components/Skeleton";
-import { GET_ACCESS, URL, generateUrl, selectionProperties } from "./components/Provider";
+import { GET_ACCESS, URL, generateUrl, selectionProperties, getDummyUrl } from "./components/Provider";
 
 // const temp = generateUrl({ type: "EDITORIAL", count: initImages });
 const tempUrl = 'src/test/dataTest.json';
@@ -13,7 +13,7 @@ function sliceData(data, dispatch) {
   const obj = {
     col_one: {
       data : selectionProperties(data.slice(0, 4), true),
-      skip : true
+      skip : false
     },
     col_two: {
       data : selectionProperties(data.slice(4, 8), true),

@@ -1,6 +1,7 @@
 const SMALL_DESKTOP = 1024;
 const NORMAL_DEKSTOP = 1280;
 
+const RANDOM_NUMB_DEBUG = () => Math.floor(Math.random() * 6);
 const GET_ACCESS = (variable) => import.meta.env[variable];
 const URL = {
   INITIAL: "https://api.unsplash.com",
@@ -80,6 +81,7 @@ function selectProps(obj, debug = false) {
 }
 
 function selectionProperties(data, debug = false) {
+  console.log(data)
   if(Array.isArray(data)) {
     const tempData = [];
     data.forEach((obj) => {
@@ -88,7 +90,41 @@ function selectionProperties(data, debug = false) {
     return tempData;
   }
 
-  return selectProps(data)
+  return selectProps(data, debug)
+}
+
+function getDummyUrl() {
+  const numb = RANDOM_NUMB_DEBUG();
+  const urlHead = 'src/test/';
+  let url = null;
+
+  switch (numb) {
+    case 0 : 
+      url = `${urlHead}dataRandom_one.json`;
+      break;
+
+    case 1 :
+      url = `${urlHead}dataRandom_two.json`;
+      break;
+    
+    case 2 :
+      url = `${urlHead}dataRandom_three.json`;
+      break;
+
+    case 3 :
+      url = `${urlHead}dataRandom_four.json`;
+      break;
+
+    case 4 :
+      url = `${urlHead}dataRandom_five.json`;
+      break;
+
+    case 5 : 
+    url = `${urlHead}dataRandom_six.json`;
+    break;
+  }
+
+  return url;
 }
 
 
@@ -99,5 +135,6 @@ export {
   SMALL_DESKTOP,
   generateUrl,
   nameConnector,
-  selectionProperties
+  selectionProperties,
+  getDummyUrl
 }
