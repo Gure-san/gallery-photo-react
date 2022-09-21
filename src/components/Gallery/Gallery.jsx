@@ -26,17 +26,38 @@ function getLastImg() {
   return lastImgs;
 }
 
+function statusChecker(initialStatus) {
+  let status = null;
+  const lengthStatus = initialStatus.length;
+  
+  for(let x = 0; x < lengthStatus; x++) {
+    if(initialStatus[0]) return status = true;
+    
+  }
+
+  return status;
+}
+
 function checkData(incomingData, dispatch) {
   function acceptData(arrData) {
+    let pushDataIndicator = false;
+
     const data = selectionProperties(incomingData);
-    const prevData = arrData;
-    prevData.forEach(col => col.push(data));
+    const prevData = arrData; //col_one, col_two, col_three
+    
+    const statusColOne = prevData[0]['skip'];
+    const statusColTwo = prevData[1]['skip'];
+    const statusColThree = prevData[2]['skip'];
+    const allStatus = statusChecker([statusColOne, statusColTwo, statusColThree]); // if true, all statuses are true. || if false one of the statuses is false
+
+    
+
     return prevData;
   } 
 
   dispatch(prevData => {
     const {col_one, col_two, col_three} = prevData;
-    const [newData_one, newData_two, newData_three] = acceptData([col_one, col_two, col_three]);
+    const [newData_one, newData_two, newData_three] = acceptData([col_one, col_two, col_three]); // containe prop data and skip
     return { col_one : newData_one, col_two : newData_two, col_three: newData_three };
   })
 }
@@ -45,13 +66,11 @@ function lastImgObserver({dispatch = null, state}) {
   const { stateRendering, querySearch } = state;
   const lastImgs = getLastImg();
   const url = (stateRendering == 'search') ? generateUrl({type : 'RANDOM_SEARCH', customValue : querySearch}) : generateUrl({type : 'RANDOM'}); 
-  console.log(url);
   const observer = new IntersectionObserver(
     (entries, observer) => {
       entries.forEach((img) => {
         if (img.isIntersecting) {
           if (img.target.classList.contains("lastImg")) {
-            console.log(img.isIntersecting)
             fetch(url).
             then(src => src.json()).
             then(src => checkData(src, dispatch));
@@ -137,17 +156,17 @@ export function Gallery({ data, state }) {
         <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] xl:max-w-[1024px] lg:max-w-[768px] max-w-[425px] gap-4 mx-auto mb-8">
           {/* Col 1 */}
           <div className="flex flex-wrap gap-4 w-full colContainer">
-            <ImageElements dataUrl={dataImgs.col_one} />
+            <ImageElements dataUrl={dataImgs.col_one.data} />
           </div>
 
           {/* Col 2 */}
           <div className="flex flex-wrap gap-4 w-full colContainer">
-            { (sizeDevice > SMALL_DESKTOP) && <ImageElements dataUrl={dataImgs.col_two} /> }
+            { (sizeDevice > SMALL_DESKTOP) && <ImageElements dataUrl={dataImgs.col_two.data} /> }
           </div>
 
           {/* Col 3 */}
           <div className="xl:flex lg:hidden flex flex-wrap gap-4 w-full colContainer">
-            { (sizeDevice > NORMAL_DEKSTOP) && <ImageElements dataUrl={dataImgs.col_three} /> }
+            { (sizeDevice > NORMAL_DEKSTOP) && <ImageElements dataUrl={dataImgs.col_three.data} /> }
           </div>
         </div>
       ) : (

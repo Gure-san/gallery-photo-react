@@ -47,7 +47,23 @@ function nameConnector(firstName, lastName) {
   return `${first_name} ${last_name}`;
 }
 
-function selectProps(obj) {
+function selectProps(obj, debug = false) {
+  if(debug) {
+    const data = {
+      alt: obj.alt,
+      width: obj.width,
+      height: obj.height,
+      url: obj.url,
+      photographer: {
+        name: obj.photographer.name,
+        profil: obj.photographer.profil,
+      },
+      download: obj.download,
+    };
+    
+    return data;
+  }
+
   const data = {
     alt: obj.alt_description == null ? "" : obj.alt_description,
     width: obj.width,
@@ -63,11 +79,11 @@ function selectProps(obj) {
   return data;
 }
 
-function selectionProperties(data) {
+function selectionProperties(data, debug = false) {
   if(Array.isArray(data)) {
     const tempData = [];
     data.forEach((obj) => {
-      tempData.push(selectProps(obj));
+      tempData.push(selectProps(obj, debug));
     });
     return tempData;
   }
