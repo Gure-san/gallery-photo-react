@@ -2,7 +2,7 @@ const SMALL_DESKTOP = 1024;
 const NORMAL_DEKSTOP = 1280;
 
 const RANDOM_NUMB_DEBUG = () => Math.floor(Math.random() * 6);
-const GET_ACCESS = (variable) => import.meta.env[variable];
+const GET_ACCESS = () => import.meta.env.VITE_UNSPLASH_API_KEY;
 const URL = {
   INITIAL: "https://api.unsplash.com",
   PHOTOS: "/photos",
@@ -17,7 +17,7 @@ const URL = {
 };
 
 const BASE_HEAD = `${URL.INITIAL}`; 
-const BASE_FOOT = `${URL.CLIENT_ID}${GET_ACCESS('VITE_UNSPLASH_API_KEY')}`;
+const BASE_FOOT = `${URL.CLIENT_ID}${GET_ACCESS()}`;
 
 function generateUrl({ type, count = 1, customValue = false }) {
   let url;
