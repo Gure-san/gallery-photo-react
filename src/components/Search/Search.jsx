@@ -29,7 +29,7 @@ function Search({stateRendering}) {
         />
         <button
         type={"submit"} 
-        className="mx-2 text sm px-6 py-1 rounded-md text-white bg-dark">
+        className="mx-2 text-sm px-4 py-1.5 rounded-md text-white bg-dark">
           Search
         </button>
       </form>

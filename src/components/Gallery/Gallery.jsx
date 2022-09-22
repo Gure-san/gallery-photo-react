@@ -153,7 +153,7 @@ function GenerateImgElement({ url, width, height, alt, info }) {
         width={width}
         height={height}
         alt={alt}
-        className="object-cover rounded-md"
+        className="object-cover sm:rounded-md"
       />
     </div>
   );
